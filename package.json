@@ -1,0 +1,16 @@
+{
+  "name": "project_v1",
+  "version": "1.0.0",
+  "description": "Decentralised Stock Exchange (KIT-IISM Thesis project)",
+  "main": "DSX.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mgsgde",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.4",
+    "jquery": "^3.0.0",
+    "web3": "^0.17.0-alpha"
+  }
+}
