@@ -103,8 +103,14 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 
 [This](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js) solidity online compiler is a quite useful tool to test your contracts. 
 
-#####7.1 Set Entpoint
-#####7.1 Set Entpoint
+#####7.1 Set up Node
+We need to add the online compiler to our list of servers, that are allowed to interact with our node  despite the same origin policy.
+
+    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" console
+
+(Make sure to access the online compiler via **http** protocol and not via https protocol.)
+
+#####7.2 Set Endpoint
 In the menu you can choose the "Web3 Provider" as execution environment. As enpoint type in the rpcaddress and rpc port from our node
 
     http://localhost:8454
