@@ -1,4 +1,4 @@
-# Ethereum Guide - (Example: Decentralised Stock Exchange)
+# Ethereum Guide
 
 ## 1. GETH
 #### install
@@ -32,10 +32,6 @@ geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --d
 * --genesis : json.file that defines the very first block in our prive blockchain that everybody has to agree on
 
 
-Wenn du nun zusätzliche nodes verbinden möchtest, dann musst eigt nur einen anderen pfad beim geth start command angeben und das gleiche Genesis.json file reinkopieren. Ports müsstest du natürlich auch andere verwenden.
-
-Das sollte ich mal ordentlich und verständlich runterschreiben 😃  
-
 WEBSITE: 
 <script type="text/javascript" src="scripts//web3/dist/web3.js"> 
 web3 = new Web3();
@@ -50,7 +46,7 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 
 ## 5. How to connect nodes to your private blockchain
 
-## 6. How to connect your private chain to the official Mist Wallet.
+## 6. How to connect your private chain to the official Mist Wallet
 
 
 
