@@ -75,7 +75,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 #####3.2 Get web3.js library (easy way to access geth's RPC interface from a js app) 
 Download [here](https://github.com/ethereum/web3.js/) or use `npm install web3`. Copy web3 folder to directory 'public'. 
     
-#####3.3 Create html file in directory 'public' and access web3.js
+#####3.3 Create html file in directory 'public'
 
 ```html
 <!DOCTYPE html>
