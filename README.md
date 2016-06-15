@@ -6,7 +6,13 @@
     sudo add-apt-repository -y ppa:ethereum/ethereum
     sudo apt-get update
     sudo apt-get install ethereum
-GETH is the command line interface to run your node. Apart from interacting via command line, it also provides an interactive console 'geth console' and  
+    
+GETH is the command line interface to run your node. Apart from interacting via command line, it also provides an interactive console and a JSON-RPC Server 
+
+* start console
+   '''geth console'''
+* access Node from Browser
+    geth --rpc --rpccorsdomain "<<your webserver address>> 
 
 
 
