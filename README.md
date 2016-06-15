@@ -99,7 +99,19 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 
 ## 6. How to connect nodes to your private blockchain
 
-## 7. How to connect your private chain to the official Mist Wallet
+## 7. How to connect your private chain to the Online Solidity Compiler 
+
+[This](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js) solidity online compiler is a quite useful tool to test your contracts. 
+
+#####7.1 Set Entpoint
+#####7.1 Set Entpoint
+In the menu you can choose the "Web3 Provider" as execution environment. As enpoint type in the rpcaddress and rpc port from our node
+
+    http://localhost:8454
+
+## 8. How to connect your private chain to the Mist Wallet 
+
+
 
 
 
