@@ -1,4 +1,4 @@
-# Ethereum Guide - (Decentralised Stock Exchange as Example)
+# Ethereum Guide - (Example: Decentralised Stock Exchange)
 
 
 ## 1. How to set up an Ethereum Node on a private Blockchain
