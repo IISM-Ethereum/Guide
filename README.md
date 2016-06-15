@@ -1,9 +1,24 @@
 # Ethereum Guide - (Example: Decentralised Stock Exchange)
 
+## Install GETH
+
+    sudo apt-get install software-properties-common
+    sudo add-apt-repository -y ppa:ethereum/ethereum
+    sudo apt-get update
+    sudo apt-get install ethereum
+GETH is the command line interface to run your node. Apart from interacting via command line, it also provides an interactive console 'geth console' and  
+
+
+
+
+
+
+
+
 
 ## 1. How to set up an Ethereum Node on a private Blockchain
 
-GETH is the command line interface to run your node. 
+
 
 geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/mgsgde/privateEthereum"
 --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json"  console
