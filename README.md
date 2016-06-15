@@ -98,6 +98,30 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 ## 5. How to interact with contracts 
 
 ## 6. How to connect nodes to your private blockchain
+Simply use the **same gensis block** and the **same network id**. 
+*(Since we are on the same machine, we need to change the port and the datadir)*
+
+First Node: 
+
+    geth --port 30307 --datadir "/home/mgsgde/privateEthereum1" --genesis "/home/mgsgde/privateEthereum1/CustomGenesis.json" --networkid 27 console
+    
+Second Node:
+
+    geth --port 30304 --datadir "/home/mgsgde/privateEthereum2" --genesis "/home/mgsgde/privateEthereum2/CustomGenesis.json" --networkid 27 console
+
+In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node. 
+
+Retrieve the enode address with the following command:
+
+    admin.nodeInfo.enode
+   
+Set bootnodes via command line
+
+    geth --bootnodes "enode://pubkey1@ip1:port1 enode://pubkey2@ip2:port2 enode://pubkey3@ip3:port3"
+    
+or via geth console
+
+    admin.addPeer("enode://pubkey1@ip1:port1")
 
 ## 7. How to connect your private chain to the Online Solidity Compiler 
 
@@ -111,12 +135,14 @@ We need to add the online compiler to our list of servers, that are allowed to i
 (Make sure to access the online compiler via **http** protocol and not via https protocol.)
 
 #####7.2 Set Endpoint
-In the menu you can choose the "Web3 Provider" as execution environment. As enpoint type in the rpcaddress and rpc port from our node
+In the menu you can choose the "Web3 Provider" as execution environment. As endpoint type in the rpc-address and rpc-port from our node
 
     http://localhost:8454
 
 ## 8. How to connect your private chain to the Mist Wallet 
+When a node is started, geth produces an ipc file in the nodes datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it. 
 
+    geth --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" --ipcpath /home/mgsgde/.ethereum/geth.ipc --networkid 27 console
 
 
 
