@@ -92,10 +92,34 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
   </body>
 </html>
 ```
-
 ## 4. How to deploy contracts 
+#####4.1 
+ ```
+    miner.start(1); admin.sleepBlocks(1); miner.stop();
+     
+    source = "contract test {\n" +
+    "   /// @notice will multiply `a` by 7.\n" +
+    "   function multiply(uint a) returns(uint d) {\n" +
+    "      return a * 7;\n" +
+    "   }\n" +
+    "} ";
+    contract = eth.compile.solidity(source).test;
+    txhash = eth.sendTransaction({from: primary, data: contract.code});
+
+    miner.start(1); admin.sleepBlocks(1); miner.stop();
+    contractaddress = eth.getTransactionReceipt(txhash).contractAddress;
+    eth.getCode(contractaddress);
+
+    multiply7 = eth.contract(contract.info.abiDefinition).at(contractaddress);
+    fortytwo = multiply7.multiply.call(6);
+```
 
 ## 5. How to interact with contracts 
+
+    multiply7 = eth.contract(info.abiDefinition).at(contractaddress);
+    fortytwo = multiply7.multiply.sendTransaction(6, { from: primary });
+    // alternatively assuming eth.defaultAccount is set 
+    fortytwo = multiply7.muliply(6);
 
 ## 6. How to connect nodes to your private blockchain
 Simply use the **same gensis block** and the **same network id**. 
