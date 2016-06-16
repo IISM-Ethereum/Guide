@@ -194,6 +194,10 @@ or via geth console
 
     admin.addPeer("enode://pubkey1@ip1:port1")
 
+If there is an error, saying that the chain is broken, delete all chaindata in both projects and run again. 
+
+If you run the second node on your local computer you can leave both ips blank, when adding to network. 
+
 ## 8. How to connect your private chain to the Mist Wallet 
 When a node is started, geth produces an ipc file in the nodes datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it. 
 
