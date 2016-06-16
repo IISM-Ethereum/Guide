@@ -35,7 +35,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 
 ```
 {
-	"nonce": "0x123456789",
+	"nonce": "0x1779246622",
 	"timestamp": "0x0",
 	"parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
 	"extraData": "0x0",
@@ -43,7 +43,12 @@ GETH is the command line interface to run your node. Apart from interacting via 
 	"difficulty": "0x400",
 	"mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
 	"coinbase": "0x3333333333333333333333333333333333333333",
+	"alloc": {
+"d26dc96279a21f14cad8cf65dda113c781b2a8c9": { "balance": "1000000000000000000000000000000" },
+"0xf8f0abbc943dbb56ec230bded3f7ae3c64322e0e" :{ "balance": "1000000000000000000000000000000" }
+	}
 }
+
 ```
 
 ## 3. How to connect your web application to the local Node (using nodejs + express)
