@@ -93,10 +93,21 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 </html>
 ```
 ## 4. How to deploy contracts 
-#####4.1 
- ```
-    miner.start(1); admin.sleepBlocks(1); miner.stop();
+
+#####4.1 Install Solidiy Compiler solc
+
+    npm install solc 
+   
+You can check the installation in the interactive console via 
+
+    eth.getCompilers()
+ 
+If it does not return ["Solidity"], then set the path manually interactive console via 
      
+    `admin.setSolc("<<path to the solc executable>>");`
+    
+#####4.2 Compile test contract in interactive console 
+ ```
     source = "contract test {\n" +
     "   /// @notice will multiply `a` by 7.\n" +
     "   function multiply(uint a) returns(uint d) {\n" +
@@ -112,28 +123,59 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 
     multiply7 = eth.contract(contract.info.abiDefinition).at(contractaddress);
     fortytwo = multiply7.multiply.call(6);
+
 ```
 
-## 5. How to interact with contracts 
+*Note: with js you can access all those functions via web3.js library.  Thus except for appending web3 in front of each command nothing changes.*
 
-    multiply7 = eth.contract(info.abiDefinition).at(contractaddress);
-    fortytwo = multiply7.multiply.sendTransaction(6, { from: primary });
+#####4.3 Compile via Online Solidity Compiler (Recommended) 
+
+Go to the [Online Solidity Compiler](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js), write down your smart contracts and simply execute the content of the field "Web3 deploy" in the geth console. 
+
+## 5. How to connect your private chain to the Online Solidity Compiler 
+
+The [Online Compiler](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js) provides the possiblity to create and test contracts directly on your private blockchain. 
+
+#####5.1 Set up Node
+We need to add the online compiler to our list of servers, that are allowed to interact with our node  despite the same origin policy.
+
+    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" console
+
+(Make sure to access the online compiler via **http** protocol and not via https protocol.)
+
+#####5.2 Set Endpoint
+In the menu you can choose the "Web3 Provider" as execution environment. As endpoint type in the rpc-address and rpc-port from our node
+
+    http://localhost:8454
+
+
+## 6. How to interact with contracts from a different node
+
+#####6.1 Get required information about conract on node where it was created: 
+
+    multiply.address;
+    mutliply.abi;
+
+#####6.2 Different Node: 
+
+    multiply7 = eth.contract(<<abi>>).at(<<address>>);
+    fortytwo = multiply7.multiply.sendTransaction(6, { from: <<your account address>> });
     // alternatively assuming eth.defaultAccount is set 
     fortytwo = multiply7.muliply(6);
 
-## 6. How to connect nodes to your private blockchain
+## 7. How to connect nodes to your private blockchain
 Simply use the **same gensis block** and the **same network id**. 
 *(Since we are on the same machine, we need to change the port and the datadir)*
 
-First Node: 
+#####7.1 First Node: 
 
     geth --port 30307 --datadir "/home/mgsgde/privateEthereum1" --genesis "/home/mgsgde/privateEthereum1/CustomGenesis.json" --networkid 27 console
     
-Second Node:
+#####7.2 Second Node:
 
     geth --port 30304 --datadir "/home/mgsgde/privateEthereum2" --genesis "/home/mgsgde/privateEthereum2/CustomGenesis.json" --networkid 27 console
 
-In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node. 
+#####7.3 In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node. 
 
 Retrieve the enode address with the following command:
 
@@ -146,22 +188,6 @@ Set bootnodes via command line
 or via geth console
 
     admin.addPeer("enode://pubkey1@ip1:port1")
-
-## 7. How to connect your private chain to the Online Solidity Compiler 
-
-[This](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js) solidity online compiler is a quite useful tool to test your contracts. 
-
-#####7.1 Set up Node
-We need to add the online compiler to our list of servers, that are allowed to interact with our node  despite the same origin policy.
-
-    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" console
-
-(Make sure to access the online compiler via **http** protocol and not via https protocol.)
-
-#####7.2 Set Endpoint
-In the menu you can choose the "Web3 Provider" as execution environment. As endpoint type in the rpc-address and rpc-port from our node
-
-    http://localhost:8454
 
 ## 8. How to connect your private chain to the Mist Wallet 
 When a node is started, geth produces an ipc file in the nodes datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it. 
