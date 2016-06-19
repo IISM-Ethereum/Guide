@@ -266,10 +266,10 @@
     balances[msg.sender][1].available = 50000;
     test_add_market(address(123));
 
-    buy(1,3,1);
-    buy(1,2,1);
+    buy(1,4,1);
+    buy(1,5,1);
     buy(1,1,1);
-    sell(1,1,1);
+    sell(2,1,1);
     sell(1,2,1);
     sell(1,3,1);
     sell(1,4,1);
@@ -323,7 +323,7 @@
             }
             id_iter_ask_helper = id_iter_ask;
             id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
-            id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
+            //id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
             test_remove_trade(id_iter_ask_helper,market_id);
             ask_matched = false;
           }
@@ -356,7 +356,7 @@
               trades[id_iter_bid].owner.send(payback);
             }
             id_iter_bid_helper = id_iter_bid;
-            id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
+            //id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
             id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
             test_remove_trade(id_iter_bid_helper,market_id);
           }
