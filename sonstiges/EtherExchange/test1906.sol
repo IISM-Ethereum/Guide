@@ -54,14 +54,14 @@
 
 
   // überträgt tokens von deiner addresse zu diesem contract der diese dann in balances mapping speichert. damit kann dann getraded weren
-      function deposit() returns (address rv){
+      function deposit() returns (address rv){  // parameter fesdtelgen
           uint256  amount = 10;
           uint256  market_id = 1;
           address  con = markets[market_id].con;
           address  hier = this;
           address  sender = msg.sender;
 
-
+          // hier die funktion via Token.at() aufrufen um ein bool rückgabe wert zu erhalten TODO
           con.call(bytes4(bytes32(sha3("transferFrom(address,address,uint256)"))), sender, hier, amount);
           uint256 balance = balances[msg.sender][market_id].available;
           balance = balance + amount;
@@ -87,7 +87,7 @@
 
     test_save_trade("BID",amount,price,market_id);
     return value;
-  }
+  } // am ende von buy die trade funktion ausführen TODO
 
   function sell(uint256 amount, uint256 price, uint256 market_id){
     if (!check_trade(amount, price, market_id)) throw;
@@ -96,7 +96,7 @@
     if (balance > amount){
       test_save_trade("ASK",amount,price,market_id);
     }
-  }
+  }  // am ende von sell die trade funktion aushüren TODO
 
   function min(uint a, uint b) returns (uint) {
       if (a < b) return a;
@@ -111,6 +111,8 @@
   bytes32 public next;
   event EventIds(bytes32 prev,bytes32 id,bytes32 next);
   event EventPrices(uint256 prev,uint256 id,uint256 next);
+
+  // umbennen TODO
   function test_save_trade(bytes32 _typ,uint256 _amount, uint256 _price, uint256 _market_id) returns(bytes32 rv){
    // inititialisieren zwecks test
    bytes32 typ = _typ;
@@ -210,8 +212,7 @@
 
   }
 
-
-
+  // umbennnen
   function test_remove_trade(bytes32 trade_id, uint256 market_id){
 
     bytes32 flag = "BID";
@@ -276,7 +277,8 @@
   }
   /* Im Moment wird nicht so viel wie möglich gematched sondern die hohen gebote werde zuerst bedient.
   Das könnte ich noch umprogrammieren, dass so viel wie möglich gematched wird und dann nach volumen
-  verteilt.
+  verteil
+  todo
 
   */
   event testEvent(bytes32 typ, uint256 price, uint256 amount);
@@ -403,7 +405,8 @@
 }
 
 
-// ################################################ /test 1906
+// todo parameter
+// todo auf standard prüfen ?!
   function test_add_market(address addr) returns (uint256 rv){
 
      bytes32 name = "test_name1";
