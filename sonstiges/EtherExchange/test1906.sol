@@ -111,7 +111,6 @@
   bytes32 public next;
   event EventIds(bytes32 prev,bytes32 id,bytes32 next);
   event EventPrices(uint256 prev,uint256 id,uint256 next);
-
   function test_save_trade(bytes32 _typ,uint256 _amount, uint256 _price, uint256 _market_id) returns(bytes32 rv){
    // inititialisieren zwecks test
    bytes32 typ = _typ;
@@ -169,7 +168,7 @@
      id = markets[market_id].ask_orderbook[trade_id].id;
      next = markets[market_id].ask_orderbook[trade_id].next_id;
      //EventIds(prev,id,next);
-     EventPrices(trades[prev].price, trades[id].price, trades[next].price);
+     //EventPrices(trades[prev].price, trades[id].price, trades[next].price);
      }
 
      if (typ == "BID"){
@@ -206,7 +205,7 @@
      id = markets[market_id].bid_orderbook[trade_id].id;
      next = markets[market_id].bid_orderbook[trade_id].next_id;
      //EventIds(prev,id,next);
-     EventPrices(trades[prev].price, trades[id].price, trades[next].price);
+     //EventPrices(trades[prev].price, trades[id].price, trades[next].price);
      }
 
   }
@@ -214,16 +213,17 @@
 
 
   function test_remove_trade(bytes32 trade_id, uint256 market_id){
-    trades[trade_id].typ = 0;
-    trades[trade_id].amount = 0;
-    trades[trade_id].price = 0;
-    trades[trade_id].market_id = 0;
-    trades[trade_id].id = 0;
-    trades[trade_id].sender = 0;
-    trades[trade_id].blockNumber = 0;
 
-    if (trades[trade_id].typ == "BID"){
+    bytes32 flag = "BID";
 
+
+    if (trades[trade_id].typ == flag){
+
+        if (markets[market_id].highest_bid_id == trade_id){
+          markets[market_id].highest_bid_id = markets[market_id].bid_orderbook[trade_id].next_id;
+          bytes32 highest = markets[market_id].highest_bid_id;
+
+        }
     bytes32 prev_id = markets[market_id].bid_orderbook[trade_id].prev_id;
     bytes32 next_id = markets[market_id].bid_orderbook[trade_id].next_id;
 
@@ -234,6 +234,12 @@
     markets[market_id].bid_orderbook[trade_id].next_id = 0;
     markets[market_id].bid_orderbook[trade_id].prev_id = 0;
     } else {
+      if (markets[market_id].lowest_ask_id == trade_id){
+        markets[market_id].lowest_ask_id = markets[market_id].ask_orderbook[trade_id].next_id;
+        bytes32 lowest = markets[market_id].highest_bid_id;
+
+      }
+
       prev_id = markets[market_id].ask_orderbook[trade_id].prev_id;
       next_id = markets[market_id].ask_orderbook[trade_id].next_id;
 
@@ -247,18 +253,26 @@
 
     markets[market_id].total_trades -= 1;
 
+    trades[trade_id].typ = 0;
+    trades[trade_id].amount = 0;
+    trades[trade_id].price = 0;
+    trades[trade_id].market_id = 0;
+    trades[trade_id].id = 0;
+    trades[trade_id].sender = 0;
+    trades[trade_id].blockNumber = 0;
   }
 
   function test(){
     balances[msg.sender][1].available = 50000;
     test_add_market(address(123));
-    buy(1,1,1);
+
     buy(1,3,1);
     buy(1,2,1);
-    sell(2,1,1);
-    sell(2,2,1);
-    sell(2,3,1);
-    sell(2,4,1);
+    buy(1,1,1);
+    sell(1,1,1);
+    sell(1,2,1);
+    sell(1,3,1);
+    sell(1,4,1);
   }
   /* Im Moment wird nicht so viel wie möglich gematched sondern die hohen gebote werde zuerst bedient.
   Das könnte ich noch umprogrammieren, dass so viel wie möglich gematched wird und dann nach volumen
@@ -290,10 +304,10 @@
         ask_matched = true;
         //if (block.number <= trades[id_iter_ask].blockNumber) continue;  // in test umgebung funktioniert das noch nicht
         if (trades[id_iter_bid].price >= trades[id_iter_ask].price) {  // es wird mehr geboten als gefragt
-          testEvent(trades[id_iter_bid].typ,trades[id_iter_bid].price,trades[id_iter_bid].amount);
+          /*testEvent(trades[id_iter_bid].typ,trades[id_iter_bid].price,trades[id_iter_bid].amount);
           testEvent1(trades[id_iter_bid].id );
           testEvent(trades[id_iter_ask].typ,trades[id_iter_ask].price,trades[id_iter_ask].amount);
-          testEvent1(trades[id_iter_ask].id  );
+          testEvent1(trades[id_iter_ask].id  ); */
 
           bid_matched = false;
          if (trades[id_iter_bid].amount > trades[id_iter_ask].amount){
@@ -347,15 +361,49 @@
             test_remove_trade(id_iter_bid_helper,market_id);
           }
         }
-
-        }
+      } // end while loop for ask bids
       ask_matched = false;
+    }
+  }
 
-      }
+  event orderBookEntry(bytes32 typ, uint256 price, uint256 amount);
+
+
+  // ############################################# test 1906
+  function test_show_orderbook()  {
+    uint256 market_id = 1;
+    bytes32 id_iter_bid = markets[market_id].highest_bid_id;
+
+    while (trades[id_iter_bid].amount != 0){
+      orderBookEntry(trades[id_iter_bid].typ, trades[id_iter_bid].price, trades[id_iter_bid].amount );
+      id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
+    }
+
+    bytes32 id_iter_ask = markets[market_id].lowest_ask_id;
+
+    while (trades[id_iter_ask].amount != 0){
+      orderBookEntry(trades[id_iter_ask].typ, trades[id_iter_ask].price, trades[id_iter_ask].amount );
+      id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
     }
 
 
+    bytes32 highest = markets[market_id].highest_bid_id;
+    bytes32 lowest = markets[market_id].lowest_ask_id;
+  }
 
+  function bytes32ToString (bytes32 data) constant internal returns (string) {
+    bytes memory bytesString = new bytes(32);
+    for (uint j=0; j<32; j++) {
+        byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
+        if (char != 0) {
+            bytesString[j] = char;
+        }
+    }
+    return string(bytesString);
+}
+
+
+// ################################################ /test 1906
   function test_add_market(address addr) returns (uint256 rv){
 
      bytes32 name = "test_name1";
