@@ -127,8 +127,10 @@
     }
 
     test_save_trade("BID",amount,price,market_id);
+    test_trade(market_id);
     return value;
-  } // am ende von buy die trade funktion ausführen TODO
+  }
+
 
   function sell(uint256 amount, uint256 price, uint256 market_id){
     if (!check_trade(amount, price, market_id)) throw;
@@ -137,7 +139,9 @@
     if (balance > amount){
       test_save_trade("ASK",amount,price,market_id);
     }
-  }  // am ende von sell die trade funktion aushüren TODO
+    test_trade(market_id);
+  }
+
 
   function min(uint a, uint b) returns (uint) {
       if (a < b) return a;
@@ -308,13 +312,9 @@
     balances[msg.sender][1].available = 50000;
     test_add_market(address(123));
 
-    buy(1,4,1);
-    buy(1,5,1);
     buy(1,1,1);
-    sell(2,1,1);
-    sell(1,2,1);
-    sell(1,3,1);
-    sell(1,4,1);
+    buy(1,2,1);
+    sell(1,1,1);
   }
   /* Im Moment wird nicht so viel wie möglich gematched sondern die hohen gebote werde zuerst bedient.
   Das könnte ich noch umprogrammieren, dass so viel wie möglich gematched wird und dann nach volumen
@@ -325,9 +325,7 @@
   event testEvent(bytes32 typ, uint256 price, uint256 amount);
   event testEvent1(bytes32 tradeid);
 
-  function test_trade() {
-
-    uint256 market_id = 1;
+  function test_trade(uint256 market_id) {
 
     bool bid_matched = false;
     bool ask_matched = false;
@@ -341,9 +339,11 @@
     bytes32 id_iter_bid_helper;
   // stopp hierer weiter arbeitne!!!!!!!!!!!!!!!!!!!!!!
     while(!bid_matched){
+      if (trades[id_iter_bid].amount == 0) return;
       bid_matched = true;
       //if (block.number <= trades[id_iter_bid].blockNumber) continue;  // in test umgebung raus lassen
       while(!ask_matched){
+        if (trades[id_iter_ask].amount == 0) return;
         ask_matched = true;
         //if (block.number <= trades[id_iter_ask].blockNumber) continue;  // in test umgebung funktioniert das noch nicht
         if (trades[id_iter_bid].price >= trades[id_iter_ask].price) {  // es wird mehr geboten als gefragt
