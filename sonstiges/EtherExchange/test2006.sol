@@ -1,5 +1,22 @@
 
 
+contract c {
+  struct Account { address owner; uint balance; }
+  Account[] accounts;
+  function newAccount(address _owner, uint _balance) {
+    accounts.push(Account(_owner, _balance));
+  }
+  function getAccount() returns(uint balance){
+      return accounts[0].balance;
+
+  }
+}
+
+
+
+
+
+
   contract Etherex {
       Market[] markets;
 
@@ -7,20 +24,13 @@
         uint256 id;
         bytes32 name;
         address con;
-        uint256 decimals;
-        uint256 precision;
-        uint256 minimum;
-        uint256 category;
         uint256 last_price;
         address owner;
-        uint256 block;
-        uint256 total_trades;
-        bytes32 last_trade;
-
+        uint256 blockNumber;
         bytes32 lowest_ask_id;
-        mapping (bytes32 => Trade_id) ask_orderbook;
-
         bytes32 highest_bid_id;
+
+        mapping (bytes32 => Trade_id) ask_orderbook;
         mapping (bytes32 => Trade_id) bid_orderbook;
 
       }
@@ -49,18 +59,19 @@
       mapping (bytes32 => uint256) markets_name;
       mapping (address => uint256) markets_id;
 
-      uint256 public last_market = 0;
+      uint256 public next_market_id = 0;
 
       uint256 _id;
 
-
       Token public token;
+
+      Market m;
       // todo parameter
       // todo auf standard prüfen ?!
         function test_add_market(address addr) returns (uint256 rv){
 
 
-          _id = last_market + 1;
+          _id = next_market_id;
 
           //if (name <= 0) throw;
          // if (markets_name[name] != 0) throw;
@@ -68,7 +79,7 @@
          // if (category < 0 || precision < 0 || minimum < 0) throw;
 
 
-            Market storage m;
+            /*Market storage m;
             m.id = _id;
             m.name = "name";
             m.con = addr;
@@ -77,11 +88,23 @@
             m.lowest_ask_id = 0;
             m.owner = msg.sender;
             m.block = block.number;
-            markets.push(m);
 
-            last_market = _id;
+
+            markets.push(m); */
+
+            markets.push( Market(_id,"name",addr,1,msg.sender,block.number,0,0));
+
+            next_market_id +=1;
+
+
               settoken(addr);
+              feesX = 1000000000000000;
+
             return _id;
+        }
+
+        function test_return() returns (uint256 rv){
+            return markets[next_market_id-1].id;
         }
 
 
@@ -110,30 +133,67 @@
           }
       }
 
+
+
   function check_trade(uint256 amount, uint256 price, uint256 market_id) returns (bool rv){
-    if (amount <= 0 || price <=0 || market_id <=0) return false;
+    if (amount <= 0 || price <=0 || market_id <0) return false;
     return true;
   }
 
+  uint256 public feesX; // equals 0.001 ether // demoktratische abstimmung über die fees
+  function check_fees(address sender, uint256 value) returns (bool rv){
+    if (value == feesX) return true;
+    if (value > feesX){
+      sender.send(value - feesX);
+      return true;
+    }
+    return false;
+  }
+
+
+    function test(){
+    feesX = 1000000000000000;
+    test_add_market(address(123));
+    balances[msg.sender][0].available = 50000;
+
+    buy(1,1,0);
+    buy(1,2,0);
+    sell(1,1,0);
+    sell(1,2,0);
+    sell(1,3,0);
+  }
+
+  function setFees(uint256 x){
+      feesX = x;
+  }
+
+  function getFees() returns (uint256 x){
+      return feesX;
+  }
+
+    event testX(uint256 amount_times_price, uint256 y, uint256 z );
+    event testY(uint256 fees);
+
   function buy(uint256 amount, uint256 price, uint256 market_id) returns(uint256 rv) {
+      testY(feesX);
     if (!check_trade(amount, price, market_id)) throw;
-
-    uint256 value = (amount*price) * 1000000000000000000;
-
-
-    if (msg.value < value) throw;
-    if (msg.value > value){
-      msg.sender.send(msg.value - value);
+    testY(feesX);
+    rv = ((amount*price) * 1000000000000000000)+feesX;
+    testX(amount*price,(amount*price) * 1000000000000000000,feesX);
+    if (msg.value < rv) throw;
+    if (msg.value >= rv){
+      msg.sender.send(msg.value - rv);
     }
 
     test_save_trade("BID",amount,price,market_id);
     test_trade(market_id);
-    return value;
+    return rv;
   }
 
 
   function sell(uint256 amount, uint256 price, uint256 market_id){
     if (!check_trade(amount, price, market_id)) throw;
+    if (!check_fees(msg.sender, msg.value)) throw;
 
     uint256 balance = balances[msg.sender][market_id].available;
     if (balance > amount){
@@ -297,7 +357,6 @@
       markets[market_id].ask_orderbook[trade_id].prev_id = 0;
     }
 
-    markets[market_id].total_trades -= 1;
 
     trades[trade_id].typ = 0;
     trades[trade_id].amount = 0;
@@ -308,14 +367,7 @@
     trades[trade_id].blockNumber = 0;
   }
 
-  function test(){
-    balances[msg.sender][1].available = 50000;
-    test_add_market(address(123));
 
-    buy(1,1,1);
-    buy(1,2,1);
-    sell(1,1,1);
-  }
   /* Im Moment wird nicht so viel wie möglich gematched sondern die hohen gebote werde zuerst bedient.
   Das könnte ich noch umprogrammieren, dass so viel wie möglich gematched wird und dann nach volumen
   verteil
@@ -414,7 +466,7 @@
 
   // ############################################# test 1906
   function test_show_orderbook()  {
-    uint256 market_id = 1;
+    uint256 market_id = 0;
     bytes32 id_iter_bid = markets[market_id].highest_bid_id;
 
     while (trades[id_iter_bid].amount != 0){
