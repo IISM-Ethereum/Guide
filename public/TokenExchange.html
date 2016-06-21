@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+      <link rel="stylesheet" href="style.css">
+    <script src="scripts/web3/dist/web3.js"></script>
+    <script src="scripts/jquery/dist/jquery.js"></script>
+    <script>
+        web3 = new Web3();
+        web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+        web3.eth.defaultAccount = web3.eth.coinbase;
+        var etherexContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"sender","type":"address"},{"name":"value","type":"uint256"}],"name":"check_fees","outputs":[{"name":"rv","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"settoken","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"next_market_id","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"buy","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"prev","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"trade_id","type":"bytes32"},{"name":"market_id","type":"uint256"}],"name":"remove_trade","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"next","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"_typ","type":"bytes32"},{"name":"_amount","type":"uint256"},{"name":"_price","type":"uint256"},{"name":"_market_id","type":"uint256"}],"name":"save_trade","outputs":[{"name":"rv","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[],"name":"testaddress","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"min","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"transferFrom","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"show_orderbook","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"fees","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"id","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"test_add_market","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"check_trade","outputs":[{"name":"rv","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"sell","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"market_id","type":"uint256"}],"name":"trade","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"test_return","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"deposit","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"test","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"typ","type":"bytes32"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"orderBookEntry","type":"event"}]);
+        var etherex = etherexContract.at("0x191e65ea87b3e455c7608eb77dbb430ba6daa392");
+
+
+        var OrderBookEntry = etherex.orderBookEntry();
+        OrderBookEntry.watch(function(e,r){
+          console.log("typ" + hex2a(r.args.typ));
+          console.log("price" + r.args.price.toNumber());
+          console.log("amount" + r.args.amount.toNumber());
+        });
+
+
+        function hex2a(hexx) {
+            var hex = hexx.toString(); //force conversion
+            var str = '';
+            for (var i = 2; i < hex.length; i += 2) {
+                if (parseInt(hex.substr(i, 2)) != 0) {
+                    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                }
+            }
+            return str;
+        }
+    </script>
+
+</head>

@@ -1,22 +1,4 @@
 
-
-contract c {
-  struct Account { address owner; uint balance; }
-  Account[] accounts;
-  function newAccount(address _owner, uint _balance) {
-    accounts.push(Account(_owner, _balance));
-  }
-  function getAccount() returns(uint balance){
-      return accounts[0].balance;
-
-  }
-}
-
-
-
-
-
-
   contract Etherex {
       Market[] markets;
 
@@ -61,49 +43,21 @@ contract c {
 
       uint256 public next_market_id = 0;
 
-      uint256 _id;
-
+      uint256 public fees;
       Token public token;
-
       Market m;
-      // todo parameter
-      // todo auf standard prüfen ?!
-        function test_add_market(address addr) returns (uint256 rv){
+      // id gelöscht ÄNDERUNG
+        function test_add_market(address addr) {
 
+          markets.push( Market(next_market_id,"name",addr,1,msg.sender,block.number,0,0));
 
-          _id = next_market_id;
+          next_market_id +=1;
 
-          //if (name <= 0) throw;
-         // if (markets_name[name] != 0) throw;
-          //if (con == 0) throw;
-         // if (category < 0 || precision < 0 || minimum < 0) throw;
-
-
-            /*Market storage m;
-            m.id = _id;
-            m.name = "name";
-            m.con = addr;
-
-            m.last_price = 1;
-            m.lowest_ask_id = 0;
-            m.owner = msg.sender;
-            m.block = block.number;
-
-
-            markets.push(m); */
-
-            markets.push( Market(_id,"name",addr,1,msg.sender,block.number,0,0));
-
-            next_market_id +=1;
-
-
-              settoken(addr);
-              feesX = 1000000000000000;
-
-            return _id;
+          settoken(addr);
+          fees = 1000000000000000;
         }
 
-        function test_return() returns (uint256 rv){
+        function test_return() constant returns (uint256 rv){
             return markets[next_market_id-1].id;
         }
 
@@ -119,12 +73,8 @@ contract c {
       return token.balanceOf(this);
     }
 
-  // überträgt tokens von deiner addresse zu diesem contract der diese dann in balances mapping speichert. damit kann dann getraded weren
-      function deposit() returns (uint256 rv){  // parameter fesdtelgen
-          uint256  amount = 10;
-          uint256  market_id = 1;
-
-
+    // parameter direkt genommen ÄNDERUNG
+  function deposit(uint256 amount,uint256 market_id) returns (uint256 rv){
           if (token.transferFrom(msg.sender, this, amount)){
             uint256 balance = balances[msg.sender][market_id].available;
             balance = balance + amount;
@@ -133,60 +83,46 @@ contract c {
           }
       }
 
-
-
   function check_trade(uint256 amount, uint256 price, uint256 market_id) returns (bool rv){
     if (amount <= 0 || price <=0 || market_id <0) return false;
     return true;
   }
 
-  uint256 public feesX; // equals 0.001 ether // demoktratische abstimmung über die fees
   function check_fees(address sender, uint256 value) returns (bool rv){
-    if (value == feesX) return true;
-    if (value > feesX){
-      sender.send(value - feesX);
+    if (value == fees) return true;
+    if (value > fees){
+      sender.send(value - fees);
       return true;
     }
     return false;
   }
 
-
-    function test(){
-    feesX = 1000000000000000;
+    function test(){    // beachte da ich hier kaufe und transaktionsgebühren bezahle stets value mitgeben
+    fees = 1000000000000000;
     test_add_market(address(123));
     balances[msg.sender][0].available = 50000;
 
-    buy(1,1,0);
     buy(1,2,0);
+    buy(1,3,0);
     sell(1,1,0);
     sell(1,2,0);
     sell(1,3,0);
   }
 
-  function setFees(uint256 x){
-      feesX = x;
-  }
 
-  function getFees() returns (uint256 x){
-      return feesX;
-  }
 
-    event testX(uint256 amount_times_price, uint256 y, uint256 z );
-    event testY(uint256 fees);
 
   function buy(uint256 amount, uint256 price, uint256 market_id) returns(uint256 rv) {
-      testY(feesX);
+
     if (!check_trade(amount, price, market_id)) throw;
-    testY(feesX);
-    rv = ((amount*price) * 1000000000000000000)+feesX;
-    testX(amount*price,(amount*price) * 1000000000000000000,feesX);
+    rv = ((amount*price) * 1000000000000000000)+fees;
     if (msg.value < rv) throw;
     if (msg.value >= rv){
       msg.sender.send(msg.value - rv);
     }
 
-    test_save_trade("BID",amount,price,market_id);
-    test_trade(market_id);
+    save_trade("BID",amount,price,market_id);
+    trade(market_id);
     return rv;
   }
 
@@ -197,9 +133,9 @@ contract c {
 
     uint256 balance = balances[msg.sender][market_id].available;
     if (balance > amount){
-      test_save_trade("ASK",amount,price,market_id);
+      save_trade("ASK",amount,price,market_id);
     }
-    test_trade(market_id);
+    trade(market_id);
   }
 
 
@@ -208,17 +144,12 @@ contract c {
       else return b;
   }
 
-  // ################################# test part ###################################################
-  // ###############################################################################################
 
   bytes32 public prev;
   bytes32 public id;
   bytes32 public next;
-  event EventIds(bytes32 prev,bytes32 id,bytes32 next);
-  event EventPrices(uint256 prev,uint256 id,uint256 next);
 
-  // umbennen TODO
-  function test_save_trade(bytes32 _typ,uint256 _amount, uint256 _price, uint256 _market_id) returns(bytes32 rv){
+  function save_trade(bytes32 _typ,uint256 _amount, uint256 _price, uint256 _market_id) returns(bytes32 rv){
    // inititialisieren zwecks test
    bytes32 typ = _typ;
    uint256 amount = _amount;
@@ -274,8 +205,6 @@ contract c {
      prev = markets[market_id].ask_orderbook[trade_id].prev_id;
      id = markets[market_id].ask_orderbook[trade_id].id;
      next = markets[market_id].ask_orderbook[trade_id].next_id;
-     //EventIds(prev,id,next);
-     //EventPrices(trades[prev].price, trades[id].price, trades[next].price);
      }
 
      if (typ == "BID"){
@@ -311,14 +240,12 @@ contract c {
      prev = markets[market_id].bid_orderbook[trade_id].prev_id;
      id = markets[market_id].bid_orderbook[trade_id].id;
      next = markets[market_id].bid_orderbook[trade_id].next_id;
-     //EventIds(prev,id,next);
-     //EventPrices(trades[prev].price, trades[id].price, trades[next].price);
      }
 
   }
 
   // umbennnen
-  function test_remove_trade(bytes32 trade_id, uint256 market_id){
+  function remove_trade(bytes32 trade_id, uint256 market_id){
 
     bytes32 flag = "BID";
 
@@ -368,16 +295,12 @@ contract c {
   }
 
 
-  /* Im Moment wird nicht so viel wie möglich gematched sondern die hohen gebote werde zuerst bedient.
-  Das könnte ich noch umprogrammieren, dass so viel wie möglich gematched wird und dann nach volumen
-  verteil
-  todo
-
+  /*
+  todo: matching based on order volume
   */
-  event testEvent(bytes32 typ, uint256 price, uint256 amount);
-  event testEvent1(bytes32 tradeid);
 
-  function test_trade(uint256 market_id) {
+
+  function trade(uint256 market_id) {
 
     bool bid_matched = false;
     bool ask_matched = false;
@@ -389,20 +312,16 @@ contract c {
 
     bytes32 id_iter_ask_helper;
     bytes32 id_iter_bid_helper;
-  // stopp hierer weiter arbeitne!!!!!!!!!!!!!!!!!!!!!!
+
     while(!bid_matched){
       if (trades[id_iter_bid].amount == 0) return;
       bid_matched = true;
-      //if (block.number <= trades[id_iter_bid].blockNumber) continue;  // in test umgebung raus lassen
+      //if (block.number <= trades[id_iter_bid].blockNumber) continue;  // todo: da trade im Zuge von buy() aufgerufen wird, kann es nicht funktionieren
       while(!ask_matched){
         if (trades[id_iter_ask].amount == 0) return;
         ask_matched = true;
-        //if (block.number <= trades[id_iter_ask].blockNumber) continue;  // in test umgebung funktioniert das noch nicht
+        //if (block.number <= trades[id_iter_ask].blockNumber) continue;   // todo: da trade im Zuge von buy() aufgerufen wird, kann es nicht funktionieren
         if (trades[id_iter_bid].price >= trades[id_iter_ask].price) {  // es wird mehr geboten als gefragt
-          /*testEvent(trades[id_iter_bid].typ,trades[id_iter_bid].price,trades[id_iter_bid].amount);
-          testEvent1(trades[id_iter_bid].id );
-          testEvent(trades[id_iter_ask].typ,trades[id_iter_ask].price,trades[id_iter_ask].amount);
-          testEvent1(trades[id_iter_ask].id  ); */
 
           bid_matched = false;
          if (trades[id_iter_bid].amount > trades[id_iter_ask].amount){
@@ -418,8 +337,7 @@ contract c {
             }
             id_iter_ask_helper = id_iter_ask;
             id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
-            //id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
-            test_remove_trade(id_iter_ask_helper,market_id);
+            remove_trade(id_iter_ask_helper,market_id);
             ask_matched = false;
           }
            if (trades[id_iter_bid].amount == trades[id_iter_ask].amount) {
@@ -436,8 +354,8 @@ contract c {
             id_iter_bid_helper = id_iter_bid;
             id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
             id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
-            test_remove_trade(id_iter_ask_helper,market_id);
-            test_remove_trade(id_iter_bid_helper,market_id);
+            remove_trade(id_iter_ask_helper,market_id);
+            remove_trade(id_iter_bid_helper,market_id);
           }
           if (trades[id_iter_bid].amount < trades[id_iter_ask].amount) {
             fill =  trades[id_iter_bid].amount;
@@ -451,9 +369,8 @@ contract c {
               trades[id_iter_bid].owner.send(payback);
             }
             id_iter_bid_helper = id_iter_bid;
-            //id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
             id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
-            test_remove_trade(id_iter_bid_helper,market_id);
+            remove_trade(id_iter_bid_helper,market_id);
           }
         }
       } // end while loop for ask bids
@@ -464,8 +381,7 @@ contract c {
   event orderBookEntry(bytes32 typ, uint256 price, uint256 amount);
 
 
-  // ############################################# test 1906
-  function test_show_orderbook()  {
+  function show_orderbook()  {
     uint256 market_id = 0;
     bytes32 id_iter_bid = markets[market_id].highest_bid_id;
 
@@ -480,10 +396,6 @@ contract c {
       orderBookEntry(trades[id_iter_ask].typ, trades[id_iter_ask].price, trades[id_iter_ask].amount );
       id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
     }
-
-
-    bytes32 highest = markets[market_id].highest_bid_id;
-    bytes32 lowest = markets[market_id].lowest_ask_id;
   }
 
   function bytes32ToString (bytes32 data) constant internal returns (string) {
@@ -499,8 +411,9 @@ contract c {
 
   }
 
-
-
+/*
+Token Standard (without any additional functionality) Source: https://github.com/ethereum/EIPs/issues/20
+*/
   contract Token {
 
     address public token = this;
@@ -573,6 +486,7 @@ contract c {
       function Token() {
           balances[msg.sender] = 10000;               // Give the creator all initial tokens
           totalSupply = 10000;                        // Update total supply
+          name = "DSX_token";
       }
 
   }
