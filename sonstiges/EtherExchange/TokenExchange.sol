@@ -39,7 +39,7 @@
       mapping (bytes32 => Trade) trades;
       mapping (address => mapping (uint256 => BalanceSt)) balances;
       mapping (bytes32 => uint256) markets_name;
-      mapping (address => uint256) markets_id;
+      mapping (address => uint256) market_ids;
 
       uint256 public next_market_id = 0;
 
@@ -50,6 +50,7 @@
         function add_market(address addr) {
 
           markets.push( Market(next_market_id,"name",addr,1,msg.sender,block.number,0,0));
+          market_ids[addr] = next_market_id;
 
           next_market_id +=1;
 
@@ -57,8 +58,13 @@
           fees = 1000000000000000;
         }
 
-        function test_return() constant returns (uint256 rv){
-            return markets[next_market_id-1].id;
+
+        function getMarketID(address addr) constant returns(uint256 rv){
+          return market_ids[addr];
+        }
+
+        function getMarketAddress(uint256 market_id) constant returns(address rv){
+          return markets[market_id].con;
         }
 
 
@@ -82,6 +88,16 @@
             return token.balanceOf(this);
           }
       }
+
+    // todo komplette funktion
+  function withdraw(uint256 amount,uint256 market_id){
+        uint256 balance = balances[msg.sender][market_id].available;
+        if (balance >= amount) {
+          balances[msg.sender][market_id].available = balance - amount;
+          address con = markets[market_id].con;
+          con.call(bytes4(bytes32(sha3("transfer(address,uint256)"))), msg.sender, amount);
+        }
+    }
 
   function check_trade(uint256 amount, uint256 price, uint256 market_id) returns (bool rv){
     if (amount <= 0 || price <=0 || market_id <0) return false;
@@ -107,6 +123,14 @@
     sell(1,1,0);
     sell(1,2,0);
     sell(1,3,0);
+  }
+
+  function getFees() constant returns(uint256 rv){
+    return fees;
+  }
+
+  function getAvaiblableTradingVolume(uint256 market_id) constant returns (uint256 rv) {
+    return balances[msg.sender][market_id].available;
   }
 
 
@@ -395,6 +419,23 @@
     }
   }
 
+  function show_orderbook(address addr)  {
+    uint256 market_id = getMarketID(addr);
+    bytes32 id_iter_bid = markets[market_id].highest_bid_id;
+
+    while (trades[id_iter_bid].amount != 0){
+      orderBookEntry(trades[id_iter_bid].typ, trades[id_iter_bid].price, trades[id_iter_bid].amount );
+      id_iter_bid = markets[market_id].bid_orderbook[id_iter_bid].next_id;
+    }
+
+    bytes32 id_iter_ask = markets[market_id].lowest_ask_id;
+
+    while (trades[id_iter_ask].amount != 0){
+      orderBookEntry(trades[id_iter_ask].typ, trades[id_iter_ask].price, trades[id_iter_ask].amount );
+      id_iter_ask = markets[market_id].ask_orderbook[id_iter_ask].next_id;
+    }
+  }
+
   function bytes32ToString (bytes32 data) constant internal returns (string) {
     bytes memory bytesString = new bytes(32);
     for (uint j=0; j<32; j++) {
@@ -481,7 +522,7 @@ Token Standard (without any additional functionality) Source: https://github.com
       string public version = 'H0.1';       //human 0.1 standard. Just an arbitrary versioning scheme.
 
       function Token() {
-          balances[msg.sender] = 10000;               // Give the creator all initial tokens
+          balances[msg.sender] = 100000;               // Give the creator all initial tokens
           totalSupply = 10000;                        // Update total supply
           name = "DSX_token";
       }
