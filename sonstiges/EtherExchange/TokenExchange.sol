@@ -46,8 +46,8 @@
       uint256 public fees;
       Token public token;
       Market m;
-      // id gelöscht ÄNDERUNG
-        function test_add_market(address addr) {
+      // name als parameter hinzufügen
+        function add_market(address addr) {
 
           markets.push( Market(next_market_id,"name",addr,1,msg.sender,block.number,0,0));
 
@@ -99,7 +99,7 @@
 
     function test(){    // beachte da ich hier kaufe und transaktionsgebühren bezahle stets value mitgeben
     fees = 1000000000000000;
-    test_add_market(address(123));
+    add_market(address(123));
     balances[msg.sender][0].available = 50000;
 
     buy(1,2,0);
@@ -108,8 +108,6 @@
     sell(1,2,0);
     sell(1,3,0);
   }
-
-
 
 
   function buy(uint256 amount, uint256 price, uint256 market_id) returns(uint256 rv) {
@@ -380,9 +378,8 @@
 
   event orderBookEntry(bytes32 typ, uint256 price, uint256 amount);
 
-
-  function show_orderbook()  {
-    uint256 market_id = 0;
+  // statt mit events zu arbeiten sollte ich constant functions nutzen um die blcokchain zu schonen
+  function show_orderbook(uint256 market_id)  {
     bytes32 id_iter_bid = markets[market_id].highest_bid_id;
 
     while (trades[id_iter_bid].amount != 0){

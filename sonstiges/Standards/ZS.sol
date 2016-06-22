@@ -110,7 +110,7 @@ contract HumanStandardToken is StandardToken {
         uint8 _decimalUnits,
         string _tokenSymbol
         ) {
-        balances[msg.sender] = _initialAmount;               // Give the creator all initial tokens
+        balances[msg.sender] = 10000;               // Give the creator all initial tokens
         totalSupply = _initialAmount;                        // Update total supply
         name = _tokenName;                                   // Set the name for display purposes
         decimals = _decimalUnits;                            // Amount of decimals for display purposes

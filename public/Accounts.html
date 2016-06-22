@@ -7,7 +7,7 @@
     <script src="scripts/jquery/dist/jquery.js"></script>
     <script>
         web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
+        web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
         var accounts = web3.eth.accounts;
         console.log(accounts);
     </script>
@@ -18,10 +18,11 @@
     <h1>The Decentralised Stock Exchange</h1>
     <div id="Navi">
         <ul>
-            <li><a href="/DollarExchange.html">Buy/Sell Bytedollar</a></li>
-            <li><a href="/StockExchange.html">Stock Exchange</a></li>
-            <li><a href="/Accounts.html">Accounts</a></li>
-            <li><a href="/Index.html">Contact</a></li>
+          <li><a href="/DollarExchange.html">Buy/Sell Bytedollar</a></li>
+          <li><a href="/StockExchange.html">Stock Exchange</a></li>
+          <li><a href="/Accounts.html">Accounts</a></li>
+          <li><a href="/TokenExchange.html">Token Exchange</a></li>
+          <li><a href="/Contact.html">Contact</a></li>
         </ul>
     </div>
     <div id="accountTable"></div>

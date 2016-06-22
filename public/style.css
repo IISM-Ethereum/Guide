@@ -29,16 +29,14 @@ th {
     padding: 0 5em 1em 0;
 }
 
-
-
-div#accountTable,div#stockInfoDiv {
+div#accountTable,div#stockInfoDiv,div#AskOrdersDiv,div#BidOrdersDiv {
   margin-top: 30px;
 
   padding: 10px;
 
 }
 
-table#tableBuySellStock{
+table#tableBuySellStock,#tableMarket,#tableBuySellToken{
   border-style:hidden;
   margin-top:15px;
   margin-left:50px;
@@ -79,7 +77,8 @@ padding: 10px;
 div#Navi {
    margin: 0;
    padding: .5em 0 .5em 0;
-   background: #ddeebb;
+   rgb(51, 102, 0,0.5);
+   background: rgba(51, 102, 0,0.3);;
    width: 100%;
    text-align: center;
 }
