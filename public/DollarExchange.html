@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+      <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="scripts//web3/dist/web3.js"></script>
+  <script src="scripts/jquery/dist/jquery.js"></script>
+    <script>
+    web3 = new Web3();
+    web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+    web3.eth.defaultAccount = web3.eth.coinbase;
+    var dsxContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"id","type":"address"},{"name":"symbol","type":"bytes32"}],"name":"getStockBalance","outputs":[{"name":"result","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"cost","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"buyDollarTokens","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"feed","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"},{"name":"","type":"address"}],"name":"stockDeposit","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"bytes32"},{"name":"amountToSell","type":"uint256"}],"name":"sellStockTokens","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"setFeed","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"amountToSell","type":"uint256"}],"name":"sellDollarTokens","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"bytes32"},{"name":"toBuy","type":"uint256"}],"name":"buyStockTokens","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"toRefund","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callbackDollar","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callbackStock","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"orders","outputs":[{"name":"isStockOrder","type":"bool"},{"name":"isBuyOrder","type":"bool"},{"name":"id","type":"address"},{"name":"symbol","type":"bytes32"},{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"amount","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callback","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"dollarBalanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"BuyStockEventAmount","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"BuyStockEventPrice","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"SellStockEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"BuyDollarEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"SellDollarEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"stockInfo","type":"event"}]);
+    var dsx = dsxContract.at("0x00dd4ce2183fc2ab2aa716a66f9bc6d1a0438103");
+
+    </script>
+</head>
+
+<body>
+    <h1>The Decentralised Stock Exchange</h1>
+    <div id="Navi">
+        <ul>
+          <li><a href="/DollarExchange.html">Buy/Sell Bytedollar</a></li>
+          <li><a href="/StockExchange.html">Stock Exchange</a></li>
+          <li><a href="/Accounts.html">Accounts</a></li>
+          <li><a href="/TokenExchange.html">Token Exchange</a></li>
+          <li><a href="/Contact.html">Contact</a></li>
+        </ul>
+    </div>
+
+    <div id="accountTableBuySell">
+        <table>
+          <tr>
+            <th>Selected Account</th>
+            <th>Bytedollar Balance</th>
+            <th>Ether Balance</th>
+          </tr>
+          <tr>
+            <td id="defaultAccount"></td>
+            <td id="balanceFromDefault"></td>
+            <td id="etherBalance"></td>
+          </tr>
+        </table>
+    </div>
+    <div id="buysell">
+      Buy ByteDollar: <br>
+      <input type="number" min="0" id="buyAmountWei">
+      <br>
+      <input type="button" onclick="buy()" value="Buy"/>
+      <br>
+      <br>
+      Sell Bytedollar:<br>
+      <input type="number" min="0" id="SellAmountGold" >
+      <br>
+      <input type="button" onclick="sell()" value="Sell"/>
+    </div>
+    <div id="goldInfo">
+    <ul id="goldInfoul" style="list-style-type:none">
+      <li id='result'></li>
+      <li id='time'></li>
+      <li id='date'></li>
+      <li id='change'></li>
+      <li id='percent'></li>
+    </ul>
+  </div>
+    <script>
+    web3.eth.defaultAccount = web3.eth.coinbase;
+    function buy() {
+        var x = document.getElementById("buyAmountWei").value;
+        document.getElementById("buyAmountWei").value = "";
+        if (x == "") {
+          alert("Please check your Input.");
+          return;
+        }
+        x = web3.toWei(x,"ether");
+        dsx.buyDollarTokens({value:x,gas:8000000});
+    }
+
+    function sell() {
+        var x = document.getElementById("SellAmountGold").value;
+        x = x * 100;
+        document.getElementById("SellAmountGold").value = "";
+        if (x == "") {
+          alert("Please check your Input.");
+          return;
+        }
+        dsx.sellDollarTokens(x,{gas:8000000});
+    }
+     console.log(web3.eth.coinbase);
+     document.getElementById("balanceFromDefault").innerHTML = dsx.dollarBalanceOf(web3.eth.coinbase).toNumber()/100;
+     var ether = web3.eth.getBalance(web3.eth.coinbase).toNumber();
+     ether = web3.fromWei(ether);
+     ether = Math.round(ether*100)/100;
+     document.getElementById("etherBalance").innerHTML = ether;
+     document.getElementById("defaultAccount").innerHTML = web3.eth.coinbase;
+
+
+    var BuyDollarEvent = dsx.BuyDollarEvent();
+    BuyDollarEvent.watch(function(e,r) {
+      alert("Bought "+r.args.amount/100+" Dollars for "+r.args.price.toNumber()/100+" USD/ETH");
+    });
+
+    var SellDollarEvent = dsx.SellDollarEvent();
+    SellDollarEvent.watch(function(e,r){
+      alert("Sold "+r.args.amount/100+" Dollars for "+r.args.price.toNumber()/100+" USD/ETH");
+    })
+
+    function hex2a(hexx) {
+        var hex = hexx.toString(); //force conversion
+        var str = '';
+        for (var i = 2; i < hex.length; i += 2) {
+            if (parseInt(hex.substr(i, 2)) != 0) {
+                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            }
+        }
+        return str;
+    }
+
+    $("document").ready(function() {
+      getPrice();
+      function getPrice(){
+        $.getJSON("https://bity.com/api/v1/rate_we_buy", function(data) {
+					var price = data.objects[4].rate;
+          var time = data.objects[4].timestamp;
+          console.log(time);
+          $("#result").html("Ether/Dollar " + price);
+          $("#time").html("Time: " + time);
+        });
+      };
+    });
+    </script>
+</body>
+
+</html>

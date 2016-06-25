@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+      <link rel="stylesheet" href="style.css">
+    <script src="scripts/web3/dist/web3.js"></script>
+    <script src="scripts/jquery/dist/jquery.js"></script>
+    <script>
+        web3 = new Web3();
+        web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+        web3.eth.defaultAccount = web3.eth.coinbase;
+        var dsxContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"id","type":"address"},{"name":"symbol","type":"bytes32"}],"name":"getStockBalance","outputs":[{"name":"result","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"cost","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"buyDollarTokens","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"feed","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"},{"name":"","type":"address"}],"name":"stockDeposit","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"bytes32"},{"name":"amountToSell","type":"uint256"}],"name":"sellStockTokens","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"setFeed","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"amountToSell","type":"uint256"}],"name":"sellDollarTokens","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"symbol","type":"bytes32"},{"name":"toBuy","type":"uint256"}],"name":"buyStockTokens","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"toRefund","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callbackDollar","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callbackStock","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"bytes32"}],"name":"orders","outputs":[{"name":"isStockOrder","type":"bool"},{"name":"isBuyOrder","type":"bool"},{"name":"id","type":"address"},{"name":"symbol","type":"bytes32"},{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"amount","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"reqID","type":"bytes32"},{"name":"price","type":"uint256"}],"name":"__callback","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"dollarBalanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"BuyStockEventAmount","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"BuyStockEventPrice","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"SellStockEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"BuyDollarEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"SellDollarEvent","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"symbol","type":"bytes32"}],"name":"stockInfo","type":"event"}]);
+        var dsx = dsxContract.at("0x00dd4ce2183fc2ab2aa716a66f9bc6d1a0438103");
+
+    </script>
+</head>
+
+<body>
+    <h1>The Decentralised Stock Exchange</h1>
+    <div id="Navi">
+        <ul>
+          <li><a href="/DollarExchange.html">Buy/Sell Bytedollar</a></li>
+          <li><a href="/StockExchange.html">Stock Exchange</a></li>
+          <li><a href="/Accounts.html">Accounts</a></li>
+          <li><a href="/TokenExchange.html">Token Exchange</a></li>
+          <li><a href="/Contact.html">Contact</a></li>
+        </ul>
+    </div>
+
+
+    <div id="stockInfoDiv">
+        <table id="stockInfoTable">
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price</th>
+                <th>Time </th>
+                <th>Date</th>
+                <th>BuyPrice</th>
+                <th style="color:red">Profit%</th>
+                <th style="color:red">Bought#</th>
+            </tr>
+        </table>
+    </div>
+    <table id="tableBuySellStock">
+        <tr id="buysellTR">
+            <td>
+                <div id="buyStock">
+                    Buy Stock:
+                    <br>
+                    <input type="text" min="0" id="symbolBuy" value="Symbol">
+                    <br>
+                    <input type="number" min="0" id="buyAmount">
+                    <br>
+                    <input type="button" onclick="buy()" value="Buy" />
+                </div>
+            </td>
+            <td>
+                <div id="sellStock">
+                    Sell Stock:
+                    <br>
+                    <input type="text" min="0" id="symbolSell" value="Symbol">
+                    <br>
+                    <input type="number" min="0" id="SellAmount">
+                    <br>
+                    <input type="button" onclick="sell()" value="Sell" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+<script>
+
+
+    $("document").ready(function() {
+      loadStockBalance();
+    });
+
+
+    function loadStockBalance(){
+      var amountOfStocks = getValuesFromCookie("amount");
+      var priceOfStocks =  getValuesFromCookie("price");
+
+      if ( amountOfStocks == "" ||  priceOfStocks == "") return;
+      if (amountOfStocks.length != priceOfStocks.length) {
+        return;
+      }
+
+      for (i = 0; i < amountOfStocks.length; i++) {
+          var amount = amountOfStocks[i].split("-");
+          var price = priceOfStocks[i].split("-");
+          if (amount[0] != price[0]){
+            return;
+          }
+          if (amount[0] == "") continue;
+          var symbol = amount[0];
+          console.log("hier üdrchte ich nicht sein");
+          console.log(amount);
+          console.log(price);
+          console.log(symbol);
+          createTableRow(symbol, amount[1], price[1]/100);
+      }
+    }
+
+    function buy() {
+        var symbol = document.getElementById("symbolBuy").value;
+        var buyAmount = document.getElementById("buyAmount").value;
+        document.getElementById("symbolBuy").value = "Symbol";
+        document.getElementById("buyAmount").value = "";
+        if (buyAmount == "") {
+            alert("Please check your Input.");
+            return;
+        }
+        dsx.buyStockTokens(symbol, buyAmount, {
+            gas: 8000000
+        });
+        alert("Buy Order sent.")
+    }
+
+    function sell() {
+        var symbol = document.getElementById("symbolSell").value;
+        var sellAmount = document.getElementById("SellAmount").value;
+        document.getElementById("symbolSell").value = "Symbol";
+        document.getElementById("SellAmount").value = "";
+        if (sellAmount == "") {
+            alert("Please check your Input.");
+            return;
+        }
+        dsx.sellStockTokens(symbol, sellAmount, {
+            gas: 8000000
+        });
+        alert("Sell Order sent.")
+    }
+
+    function hex2a(hexx) {
+        var hex = hexx.toString(); //force conversion
+        var str = '';
+        for (var i = 2; i < hex.length; i += 2) {
+            if (parseInt(hex.substr(i, 2)) != 0) {
+                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            }
+        }
+        return str;
+    }
+
+    var amount;
+    var symbolRaw;
+
+  /*  var stockInfo = dsx.stockInfo();
+    stockInfo.watch(function(e, r) {
+        var id = r.args.id;
+        amount = r.args.amount;
+        amount = r.args.amount.toNumber();
+        symbolRaw = r.args.symbol;
+        symbol = hex2a(r.args.symbol);
+        symbol = symbol.replace(/0/g, '');
+        createTableRow(symbol, amount);
+    });
+
+
+    var BuyEvent = dsx.BuyEvent();
+    BuyEvent.watch(function(e,r){
+      console.log("In BuyEvent"); // address prüfen
+      appendValueToDepotCookie("depot",hex2a(r.args.symbol));
+      createTableRow(hex2a(r.args.symbol), r.args.amount.toNumber());
+    });*/
+
+    function removeAmountFromCookies(sym, amo){
+      var prices = getValuesFromCookie("price");
+      var amounts = getValuesFromCookie("amount");
+
+      var cookieP = "";
+      var cookieA = "";
+
+      for (i=0;i<prices.length;i++){
+        var amount = amounts[i].split("-");
+        if (amount == "") continue;
+        var price = prices[i].split("-");
+        if (sym != amount[0] || amo == -1) {
+          cookieA += amount[0]+"-"+amount[1]+",";
+          cookieP += price[0]+"-"+price[1]+",";
+          continue;
+        }
+        if (amo < amount[1]){
+          amount[1] = amount[1] - amo;
+          cookieA += amount[0]+"-"+amount[1]+",";
+          cookieP += price[0]+"-"+price[1]+",";
+          amo = -1;
+          continue;
+        }
+        if (amo == amount[1]){
+          amo = -1;
+          continue;
+        }
+        if (amo > amount[1]){
+          amo = amo - amount[1];
+          continue;
+        }
+    }
+    setCookie("price",cookieP,100);
+    setCookie("amount",cookieA,100);
+    console.log(cookieP);
+    console.log(cookieA);
+  }
+
+    var SellStockEvent = dsx.SellStockEvent();
+    SellStockEvent.watch(function(e,r){
+      var amount = r.args.amount.toNumber();
+      var symbol = hex2a(r.args.symbol);
+      removeAmountFromCookies(symbol, amount);
+      alert("Sold "+amount+" "+symbol+" Stocks.");
+    });
+
+    var BuyStockEventAmount = dsx.BuyStockEventAmount();
+    var lastTrHashAmount = "";
+    BuyStockEventAmount.watch(function(e,r){
+      if (r.transactionHash == lastTrHashAmount){return;}
+      lastTrHashAmount = r.transactionHash;
+
+      var s = hex2a(r.args.symbol) + "-" + r.args.amount.toNumber();
+      console.log("In BuyStockEventAmount:"+s);
+      appendValueToDepotCookie("amount",s);
+      bridge=r.args.amount.toNumber();
+    });
+
+    var bridge;
+
+    var lastTrHashPrice = "";
+    var BuyStockEventPrice = dsx.BuyStockEventPrice();
+    BuyStockEventPrice.watch(function(e,r){
+      if (r.transactionHash == lastTrHashPrice){return;}
+      lastTrHashPrice = r.transactionHash;
+      var symb = hex2a(r.args.symbol);
+      var pric = r.args.price.toNumber()/100;
+      var s = hex2a(r.args.symbol) + "-" + r.args.price.toNumber();
+      console.log("In BuyStockEventPrice:"+s);
+      appendValueToDepotCookie("price",s);
+      createTableRow(symb,bridge,r.args.price.toNumber()/100);
+      alert("Bought "+bridge+" "+symb+" Stocks for "+pric+" USD/Stock .");
+    });
+
+
+    // Darstellung der Aktienkurse
+    function createTableRow(tokenSymbol, _amount, _price) {
+        $.getJSON("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%22" + tokenSymbol +
+            "%22)&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
+            function(data) {
+
+                var table = document.getElementById("stockInfoTable");
+                var tr = document.createElement('tr');
+
+                var nametd = document.createElement('td');
+                var LastTradePriceOnlytd = document.createElement('td');
+                var LastTradeTimetd = document.createElement('td');
+                var LastTradeDatetd = document.createElement('td');
+                var ChangeinPercenttd = document.createElement('td');
+                var symboltd = document.createElement('td');
+                var amounttd = document.createElement('td');
+                var pricetd = document.createElement('td');
+                var pricetd = document.createElement('td');
+
+                var name = data.query.results.quote.Name;
+                var LastTradePriceOnly = data.query.results.quote.LastTradePriceOnly;
+                var LastTradeTime = data.query.results.quote.LastTradeTime;
+                var LastTradeDate = data.query.results.quote.LastTradeDate;
+                var symbol = data.query.results.quote.Symbol;
+
+                var changeInPercent = (Math.round((LastTradePriceOnly/ _price)*100-100)/100);
+                nametd.appendChild(document.createTextNode(name));
+                LastTradePriceOnlytd.appendChild(document.createTextNode(LastTradePriceOnly));
+                LastTradeTimetd.appendChild(document.createTextNode(LastTradeTime));
+                LastTradeDatetd.appendChild(document.createTextNode(LastTradeDate));
+                ChangeinPercenttd.appendChild(document.createTextNode(changeInPercent));
+                symboltd.appendChild(document.createTextNode(symbol));
+                amounttd.appendChild(document.createTextNode(_amount));
+                pricetd.appendChild(document.createTextNode(_price));
+
+                tr.appendChild(nametd);
+                tr.appendChild(symboltd);
+                tr.appendChild(LastTradePriceOnlytd);
+                tr.appendChild(LastTradeTimetd);
+                tr.appendChild(LastTradeDatetd);
+                tr.appendChild(pricetd);
+                tr.appendChild(ChangeinPercenttd);
+                tr.appendChild(amounttd);
+
+                table.appendChild(tr);
+            });
+    };
+
+
+    function appendValueToDepotCookie(cookieName, value) {
+        var x = getCookie(cookieName);
+        x = x.split(",");
+        x += "," + value;
+        setCookie(cookieName, x, 100);
+    }
+
+    function getValuesFromCookie(cookieName) {
+        var x = getCookie(cookieName);
+        x = x.split(",");
+        console.log(x);
+        return x;
+    }
+
+    function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+</script>
+</body>
+
+</html>

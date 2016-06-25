@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script src="scripts/web3/dist/web3.js"></script>
+    <script src="scripts/jquery/dist/jquery.js"></script>
+    <script>
+        web3 = new Web3();
+        web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+        web3.eth.defaultAccount = web3.eth.coinbase;
+        var etherexContract = web3.eth.contract([{"constant":false,"inputs":[{"name":"sender","type":"address"},{"name":"value","type":"uint256"}],"name":"check_fees","outputs":[{"name":"rv","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"market_id","type":"uint256"}],"name":"getMarketAddress","outputs":[{"name":"rv","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"settoken","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"next_market_id","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"add_market","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"buy","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"withdraw","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"prev","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"trade_id","type":"bytes32"},{"name":"market_id","type":"uint256"}],"name":"remove_trade","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"getMarketID","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"next","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"_typ","type":"bytes32"},{"name":"_amount","type":"uint256"},{"name":"_price","type":"uint256"},{"name":"_market_id","type":"uint256"}],"name":"save_trade","outputs":[{"name":"rv","type":"bytes32"}],"type":"function"},{"constant":true,"inputs":[],"name":"testaddress","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"min","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[],"name":"transferFrom","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"fees","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"id","outputs":[{"name":"","type":"bytes32"}],"type":"function"},{"constant":false,"inputs":[{"name":"market_id","type":"uint256"}],"name":"show_orderbook","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"market_id","type":"uint256"}],"name":"getAvaiblableTradingVolume","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"check_trade","outputs":[{"name":"rv","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"price","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"sell","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"getFees","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"market_id","type":"uint256"}],"name":"trade","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"},{"name":"market_id","type":"uint256"}],"name":"deposit","outputs":[{"name":"rv","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"}],"name":"show_orderbook","outputs":[],"type":"function"},{"constant":false,"inputs":[],"name":"test","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"typ","type":"bytes32"},{"indexed":false,"name":"price","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"orderBookEntry","type":"event"}]);
+        var etherex = etherexContract.at("0x5e633fc6567e585c8d02fdf814a8891e57269f37")
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+
+
+        var OrderBookEntry = etherex.orderBookEntry();
+        OrderBookEntry.watch(function(e, r) {
+            var typ = hex2a(r.args.typ);
+            var price = r.args.price.toNumber();
+            var amount = r.args.amount.toNumber();
+            createTableRow(typ,amount,price);
+        });
+
+        function createTableRow(typ, _amount, _price) {
+            if (typ == "ASK") {
+                var table = document.getElementById("AskOrders");
+            } else {
+                var table = document.getElementById("BidOrders");
+            }
+
+            var tr = document.createElement('tr');
+
+            var typtd = document.createElement('td');
+            var amounttd = document.createElement('td');
+            var pricetd = document.createElement('td');
+
+            typtd.appendChild(document.createTextNode(typ))
+            amounttd.appendChild(document.createTextNode(_amount));
+            pricetd.appendChild(document.createTextNode(_price));
+
+            tr.appendChild(typtd);
+            tr.appendChild(pricetd);
+            tr.appendChild(amounttd);
+
+
+            table.appendChild(tr);
+        };
+
+        function hex2a(hexx) {
+            var hex = hexx.toString(); //force conversion
+            var str = '';
+            for (var i = 2; i < hex.length; i += 2) {
+                if (parseInt(hex.substr(i, 2)) != 0) {
+                    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+                }
+            }
+            return str;
+        }
+
+        function appendValueToDepotCookie(cookieName, value) {
+            var x = getCookie(cookieName);
+            x = x.split(",");
+            x += "," + value;
+            setCookie(cookieName, x, 100);
+        }
+
+        function getValuesFromCookie(cookieName) {
+            var x = getCookie(cookieName);
+            x = x.split(",");
+            console.log(x);
+            return x;
+        }
+
+        function contains(a, obj) {
+            for (var i = 0; i < a.length; i++) {
+                if (a[i] === obj) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + "; " + expires;
+        }
+
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        /*$("document").ready(function() {
+        }); */
+        var market_id = etherex.get;
+
+        function getOrderBook(){
+          $("#BidOrders td").remove();
+          $("#AskOrdersDiv td").remove();
+
+          market_id = document.getElementById("market_id").value;
+          etherex.show_orderbook(market_id, {gas:400000});    // parameter market_id // TODO:
+          var balance = etherex.getAvaiblableTradingVolume(market_id);
+          document.getElementById("balance").innerHTML = "Balance: "+balance;
+        }
+m
+        // todo: event was die market id rausgibt und den namen des token
+        function addMarket() {
+          var addr = document.getElementById("token_address").value;
+          etherex.add_market(addr,{gas:4000000});
+        }
+        // todo: die input daten reinholen
+        function buyToken() {
+          var price = +document.getElementById("TokenBuyPrice").value;
+          var volume = +document.getElementById("TokenBuyVolume").value;
+          var fees = etherex.getFees().toNumber();
+          var _value = ((volume*price) * 1000000000000000000)+2*fees;
+          etherex.buy(volume, price, market_id,{value:_value, gas:1000000});
+        }
+
+        function sellToken() {
+          var price = +document.getElementById("TokenSellPrice").value;
+          var volume = +document.getElementById("TokenSellVolume").value;
+          var fees = etherex.getFees().toNumber();
+          etherex.sell(volume, price, market_id,{value:2*fees,gas:1000000});
+        }
+
+        var tokenContract = web3.eth.contract([{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},{"constant":true,"inputs":[],"name":"version","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]);
+        var token;
+        function deposit() {
+          var addr = etherex.getMarketAddress(market_id);
+          token = tokenContract.at(addr);
+
+          var volume = document.getElementById("deposit_vol").value;
+          token.approve(etherex.address, volume);
+          etherex.deposit(volume, market_id,{gas:1000000});
+        }
+        // todo: aktuelles token samt same anzeigen
+        // todo: tabelle mit allen token und market_ids
+    </script>
+
+</head>
+
+<body>
+    <h1>The Decentralised Stock Exchange</h1>
+    <div id="Navi">
+        <ul>
+          <li><a href="/DollarExchange.html">Buy/Sell Bytedollar</a></li>
+          <li><a href="/StockExchange.html">Stock Exchange</a></li>
+          <li><a href="/Accounts.html">Accounts</a></li>
+          <li><a href="/TokenExchange.html">Token Exchange</a></li>
+          <li><a href="/Contact.html">Contact</a></li>
+        </ul>
+    </div>
+    <table id="tableMarket">
+        <tr id="trMarket">
+            <td>
+                <div id="OrderBookDiv">
+                    <input type="button" onclick="getOrderBook()" value="Get Order Book" />
+                    <input type="text" min="0" id="market_id">
+                </div>
+            </td>
+            <td>
+                <div id="AddMarketDiv">
+                  <input type="button" onclick="addMarket()" value="Add Token" />
+                  <input type="text" min="0" id="token_address">
+                </div>
+            </td>
+            <td>
+                <div id="DepositDiv">
+                  <input type="button" onclick="deposit()" value="Deposit Token" />
+                  <input type="number" min="0" id="deposit_vol">
+                </div>
+            </td>
+            <td>
+              <div id="balance"/>
+            </td>
+        </tr>
+    </table>
+    <div id="BidOrdersDiv">
+        <table id="BidOrders">
+            <tr>
+                <th>Order-Type</th>
+                <th>Price</th>
+                <th>Volume</th>
+            </tr>
+        </table>
+    </div>
+    <div id="AskOrdersDiv">
+        <table id="AskOrders">
+          <tr>
+              <th>Order-Type</th>
+              <th>Price</th>
+              <th>Volume</th>
+          </tr>
+        </table>
+    </div>
+
+    <table id="tableBuySellStock">
+        <tr id="buysellTR">
+            <td>
+                <div id="buyStock">
+                  Price/Volume:
+                    <br>
+                    <input type="number" min="0" id="TokenBuyPrice" value="price">
+                    <br>
+                    <input type="number" min="0" id="TokenBuyVolume" value="volume">
+                    <br>
+                    <input type="button" onclick="buyToken()" value="Submit Buy Order" />
+                </div>
+            </td>
+            <td>
+                <div id="sellStock">
+                    Price/Volume:
+                    <br>
+                    <input type="number" min="0" id="TokenSellPrice" value="price">
+                    <br>
+                    <input type="number" min="0" id="TokenSellVolume" value="volume">
+                    <br>
+                    <input type="button" onclick="sellToken()" value="Submit Sell Order" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+</body>
