@@ -150,7 +150,7 @@ If it does not return ["Solidity"], then set the path manually interactive conso
     contract = eth.compile.solidity(source).test;
     txhash = eth.sendTransaction({from: primary, data: contract.code});
 
-    miner.start(1); admin.sleepBlocks(1); miner.stop();
+    miner.start(); admin.sleepBlocks(1); miner.stop();
     contractaddress = eth.getTransactionReceipt(txhash).contractAddress;
     eth.getCode(contractaddress);
 
@@ -159,7 +159,7 @@ If it does not return ["Solidity"], then set the path manually interactive conso
 
 ```
 
-*Note: with js you can access all those functions via web3.js library.  Thus except for appending web3 in front of each command nothing changes.*
+*Note: with js you can access all those functions via web3.js library. Thus except for appending "web3.eth." to the beginning of each command nothing changes (e.g. "web3.eth.miner.start()") *
 
 #####4.3 Compile via Online Solidity Compiler (Recommended)
 
@@ -184,12 +184,12 @@ In the menu you can choose the "Web3 Provider" as execution environment. As endp
 
 ## 6. How to interact with contracts from a different node
 
-#####6.1 Get required information about conract on node where it was created:
+#####6.1 Get all the defining information about the contract: (if the contract was created by yourself, retrieve the info as shown below)
 
     multiply.address;
-    mutliply.abi;
+    mutliply.abi;	// interface description
 
-#####6.2 Different Node:
+#####6.2 Start different Node and find contract "multiply":
 
     multiply7 = eth.contract(<<abi>>).at(<<address>>);
     fortytwo = multiply7.multiply.sendTransaction(6, { from: <<your account address>> });
@@ -198,7 +198,7 @@ In the menu you can choose the "Web3 Provider" as execution environment. As endp
 
 ## 7. How to connect nodes to your private blockchain
 Simply use the **same gensis block** and the **same network id**.
-*(Since we are on the same machine, we need to change the port and the datadir)*
+*(Since for test purposes you might want to run two nodes on the very same machine, simply change the port and the datadir)*
 
 #####7.1 First Node:
 
@@ -214,20 +214,19 @@ Retrieve the enode address with the following command:
 
     admin.nodeInfo.enode
 
-Set bootnodes via command line
-
-    geth --bootnodes "enode://pubkey1@ip1:port1 enode://pubkey2@ip2:port2 enode://pubkey3@ip3:port3"
-
-or via geth console
+Set bootnode via geth console
 
     admin.addPeer("enode://pubkey1@ip1:port1")
 
-If there is an error, saying that the chain is broken, delete all chain data in both projects and run again.
+If there is an error, saying that the chain is broken, delete all chain data in both projects and run it again.
 
-If you run the second node on your local computer you can leave both ips blank, when adding to network.
+Check if it has worked by listing all peers via: 
+
+    admin.peers()
+  
 
 ## 8. How to connect your private chain to the Mist Wallet
-When a node is started, geth produces an ipc file in the nodes datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it.
+When a node is started, geth produces an ipc file in the node's datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it.
 
     geth --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" --ipcpath /home/mgsgde/.ethereum/geth.ipc --networkid 27 console
     
