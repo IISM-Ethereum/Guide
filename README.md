@@ -2,12 +2,12 @@
 
 #### This guide aims to get interested people quickly set up to develop smart contracts on a private blockchain. All necessary packages/tools are reflected in this guide, so at the end one should be able to start right away with the development process.
 
-At the time of writing there're three main ethereum implementations available: GETH (GO), Eth (C++) and Pyethapp. We're focussing on Geth, since it's the recommended choice if one plans to develop a corresponding frontend for a distributed database (the blockchain in our case), so-called dapps (decentralized apps).
+At the time of writing there are three main ethereum implementations available: GETH (GO), Eth (C++) and Pyethapp. We're focussing on Geth, since it's the recommended choice if one plans to develop a corresponding frontend for a distributed database (the blockchain in our case), so-called dapps (decentralized apps).
 
 Supported platforms: **Linux, MacOS**
 
 ## 1. GETH
-#####1.1 install
+#####1.1 Install
 #### Linux
     sudo apt-get install software-properties-common
     sudo add-apt-repository -y ppa:ethereum/ethereum
@@ -24,18 +24,18 @@ Install Homebrew if you haven't done yet, further information to be found [here]
 
 GETH is the command line interface to run your node. Apart from interacting via command line, it also provides an interactive console and a JSON-RPC Server.  
 
-#####1.2 interactive console:
+#####1.2 Start node and interact via built-in console:
 
     geth console
 
-#####1.3 access node via JSON-RPC api from browser:
+#####1.3 Start node and interact via JSON-RPC api from your browser:
 
     geth --rpc --rpccorsdomain "<<your webserver address>>
 
 
 ## 2. How to set up an Ethereum Node on a private Blockchain
 
-#####2.1 full start command for node
+#####2.1 Full start command for node
 
 #### Linux
     geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum"
@@ -45,12 +45,12 @@ GETH is the command line interface to run your node. Apart from interacting via 
     geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum"
     --genesis "/Users/USER/privateEthereum/CustomGenesis.json" console
 
-#####2.2 details on the command above
+#####2.2 Detailed information about the command above
 * **--rpc** : Enables remote procedure calls (so that our website can interact with the node).
 
 * **--rpcport** : Port that is used by the Web-Browser to interact with the local node.
 
-* **--rpccorsdomain** : We need to allow cross site origin requests, so that our Web-browser can access the local node while being connected with our Web-Server. By default Web-Browsers do not allow scripts being executed from one origin (our website) to access data from another origin (our node).
+* **--rpccorsdomain** : We need to allow cross site origin requests, so that our Web-browser can access the local node while being connected with our Web-Server. By default Web-Browsers do not allow scripts being retrieved from one origin (our webserver) to access data from another origin (our node).
 * **--datadir** : An arbitrary path in the user directory where the blockchain should be synchronized to.
 
 * **--genesis** : json.file that defines the very first block in our private blockchain that everybody has to agree on.
@@ -70,8 +70,8 @@ A sample Genesis file looks as follows. In this example two accounts with a bala
 	"mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
 	"coinbase": "0x3333333333333333333333333333333333333333",
 	"alloc": {
-"d26dc96279a21f14cad8cf65dda113c781b2a8c9": { "balance": "1000000000000000000000000000000" },
-"0xf8f0abbc943dbb56ec230bded3f7ae3c64322e0e" :{ "balance": "1000000000000000000000000000000" }
+"d26dc93479a21f14fgd8cf65dda113c781b2a8c9": { "balance": "1000000000000000000000000000000" },
+"0xf8f0abbc343dbb56er230bded3f7ae3c64322e0e" :{ "balance": "1000000000000000000000000000000" }
 	}
 }
 
@@ -94,11 +94,11 @@ Create a directory somewhere and then run the following commands.
 
     var app = express();
 
-    app.use(express.static('public'));  // files in directory 'public' get sent to client automatically
+    app.use(express.static('public'));  // files in directory 'public' get sent to client's webbrowser automatically
 
     var server = app.listen(8081, function () {
 
-     var host = server.address().address
+    var host = server.address().address
     var port = server.address().port
 
     console.log("App listening at http://%s:%s", host, port)
@@ -230,7 +230,22 @@ If you run the second node on your local computer you can leave both ips blank, 
 When a node is started, geth produces an ipc file in the nodes datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it.
 
     geth --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" --ipcpath /home/mgsgde/.ethereum/geth.ipc --networkid 27 console
+    
+## 9. Useful links / Sources 
 
+[Online Compiler](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js)
+
+[Solidity Documentation](https://media.readthedocs.org/pdf/solidity/latest/solidity.pdf) 
+
+[JS Api: App Development](https://github.com/ethereum/wiki/wiki/JavaScript-API)
+
+[JS Api: all functionality](https://github.com/ethereum/go-ethereum/wiki/JavaScript-Console)
+
+[Management of Contracts and Transactions](https://github.com/ethereum/go-ethereum/wiki/Contracts-and-Transactions)
+
+[Setting up your private Network](https://github.com/ethereum/go-ethereum/wiki/Connecting-to-the-network)
+
+[Token Standard](https://github.com/ethereum/EIPs/issues/20)
 
 ### Authors
 Magnus Gödde (@mgsgde)  
