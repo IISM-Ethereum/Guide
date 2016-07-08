@@ -30,7 +30,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 
 #####1.3 Start node and interact via JSON-RPC api from your browser:
 
-    geth --rpc --rpccorsdomain "<<your webserver address>>
+    geth --rpc --rpccorsdomain "<<your webserver address>>"
 
 
 ## 2. How to set up an Ethereum Node on a private Blockchain
@@ -46,11 +46,13 @@ GETH is the command line interface to run your node. Apart from interacting via 
     --genesis "/Users/USER/privateEthereum/CustomGenesis.json" console
 
 #####2.2 Detailed information about the command above
-* **--rpc** : Enables remote procedure calls (so that our website can interact with the node).
+* **--rpc** : Enables remote procedure calls (so that our website can interact with the node). The default APIs enabled are: "eth,net,web3".
+
+* **--rpcapi**: Specify APIs to be enabled via HTTP-RPC, i.e. "eth,net,web3,admin,miner". **Note:** It's considered highly insecure to enable "personal" over RPC, since any user connecting to your node could brute-force the accounts in order to steal ether.
 
 * **--rpcport** : Port that is used by the Web-Browser to interact with the local node.
 
-* **--rpccorsdomain** : We need to allow cross site origin requests, so that our Web-browser can access the local node while being connected with our Web-Server. By default Web-Browsers do not allow scripts being retrieved from one origin (our webserver) to access data from another origin (our node).
+* **--rpccorsdomain** : We need to allow cross site origin requests, so that our Web-browser can access the local node while being connected with our Web-Server. By default Web-Browsers do not allow scripts being retrieved from one origin (our webserver) to access data from another origin (our node). There's the possiblity to use a wildcard operator to allow all cross-origin connections (*), which is less secure but more convenient.
 * **--datadir** : An arbitrary path in the user directory where the blockchain should be synchronized to.
 
 * **--genesis** : json.file that defines the very first block in our private blockchain that everybody has to agree on.
@@ -76,6 +78,9 @@ A sample Genesis file looks as follows. In this example two accounts with a bala
 }
 
 ```
+
+Connecting to the node via RPC is great for development purposes, but the preferred way of securely interacting with the node is ipc, where all necessary APIs are enabled by default: "admin,db,eth,debug,miner,net,shh,txpool,personal,web3".
+However, ipc connections are currently not supported by the web3.js library (there's a fork which is under heavy development), so we'll stick to RPC for now.
 
 ## 3. How to connect your web application to the local Node (using NodeJS + express)
 
