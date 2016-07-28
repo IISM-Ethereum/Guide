@@ -44,7 +44,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
 	``` 
    
-**Note:** the option --genesis is deprecated and does not work anymore
+**Note:** the option --genesis is deprecated and does not work anymore. geth init is the new command to initialize the genesis block. **Make sure to always include the datadir when executing the geth init command**, otherwise the public chain's genesis block gets deleted. 
 
 #### MacOS
 
