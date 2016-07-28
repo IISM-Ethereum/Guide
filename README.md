@@ -39,7 +39,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 
 #### Linux
 	```	
-	geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
+	geth --datadir "/home/USER/privateEthereum" init CustomGenesis.json
     
 	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
 	``` 
@@ -48,7 +48,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 
 #### MacOS
 
-     geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
+     geth --datadir "/home/USER/privateEthereum" init CustomGenesis.json
      geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum" console
 
 #####2.2 Detailed information about the command above
