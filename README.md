@@ -38,21 +38,18 @@ GETH is the command line interface to run your node. Apart from interacting via 
 #####2.1 Full start command for node
 
 #### Linux
-```	
+	```	
 	geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
     
 	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
-   ``` 
+	``` 
    
 **Note:** the option --genesis is deprecated and does not work anymore
-```	    
-	geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
-    
-	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
-```
+
 #### MacOS
-    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum"
-    --genesis "/Users/USER/privateEthereum/CustomGenesis.json" console
+
+     geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
+     geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum" console
 
 #####2.2 Detailed information about the command above
 * **--rpc** : Enables remote procedure calls (so that our website can interact with the node). The default APIs enabled are: "eth,net,web3".
@@ -64,7 +61,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
 * **--rpccorsdomain** : We need to allow cross site origin requests, so that our Web-browser can access the local node while being connected with our Web-Server. By default Web-Browsers do not allow scripts being retrieved from one origin (our webserver) to access data from another origin (our node). There's the possiblity to use a wildcard operator to allow all cross-origin connections (*), which is less secure but more convenient.
 * **--datadir** : An arbitrary path in the user directory where the blockchain should be synchronized to.
 
-* **--genesis** : json.file that defines the very first block in our private blockchain that everybody has to agree on.
+* **init** : initializes the json.file that defines the very first block in our private blockchain that everybody has to agree on.
 
 In our case, the Genesis file is located in the same directory where the blockchain data will be located once the setup is completed.
 
