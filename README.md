@@ -234,9 +234,9 @@ Set bootnode via geth console
 If there is an error, saying that the chain is broken, delete all chain data in both projects and run it again.
 
 Check if it has worked by listing all peers via: 
-
+```
     admin.peers()
-  
+```
 
 ## 8. How to connect your private chain to the Mist Wallet
 When a node is started, geth produces an ipc file in the node's datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it.
