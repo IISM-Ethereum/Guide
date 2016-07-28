@@ -38,9 +38,18 @@ GETH is the command line interface to run your node. Apart from interacting via 
 #####2.1 Full start command for node
 
 #### Linux
-    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum"
-    --genesis "/home/USER/privateEthereum/CustomGenesis.json" console
-
+```	
+	geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
+    
+	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
+   ``` 
+   
+**Note:** the option --genesis is deprecated and does not work anymore
+```	    
+	geth --datadir "/home/USER/privateEthereum/CustomGenesis.json" init
+    
+	geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/home/USER/privateEthereum" console
+```
 #### MacOS
     geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum"
     --genesis "/Users/USER/privateEthereum/CustomGenesis.json" console
@@ -177,7 +186,7 @@ The [Online Compiler](http://ethereum.github.io/browser-solidity/#version=soljso
 #####5.1 Set up Node
 We need to add the online compiler to our list of servers, that are allowed to interact with our node  despite the same origin policy.
 
-    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" console
+    geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/USER/privateEthereum" console
 
 (Make sure to access the online compiler via **http** protocol and not via https protocol.)
 
@@ -207,11 +216,13 @@ Simply use the **same gensis block** and the **same network id**.
 
 #####7.1 First Node:
 
-    geth --port 30307 --datadir "/home/mgsgde/privateEthereum1" --genesis "/home/mgsgde/privateEthereum1/CustomGenesis.json" --networkid 27 console
+    geth --port 30307 --datadir "/home/USER/privateEthereum1" --networkid 27 console
 
 #####7.2 Second Node:
 
-    geth --port 30304 --datadir "/home/mgsgde/privateEthereum2" --genesis "/home/mgsgde/privateEthereum2/CustomGenesis.json" --networkid 27 console
+    geth --port 30304 --datadir "/home/USER/privateEthereum2" --networkid 27 console
+
+Make sure to initialize again the very same custom genesis block as described in chapter 2, otherwise you will be on the main chain. 
 
 #####7.3 In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node.
 
@@ -233,7 +244,7 @@ Check if it has worked by listing all peers via:
 ## 8. How to connect your private chain to the Mist Wallet
 When a node is started, geth produces an ipc file in the node's datadir. By default the Mist wallet is looking for this ipc file in the main ethereum folder ~/.ethereum/ . Consenquently we have to define the very same directory for our test network, so that the file gets produced in the dir where Mist is looking for it.
 
-    geth --datadir "/home/mgsgde/privateEthereum" --genesis "/home/mgsgde/privateEthereum/CustomGenesis.json" --ipcpath /home/mgsgde/.ethereum/geth.ipc --networkid 27 console
+    geth --datadir "/home/USER/privateEthereum" --ipcpath /home/USER/.ethereum/geth.ipc --networkid 27 console
     
 ## 9. Useful links / Sources 
 
