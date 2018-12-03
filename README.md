@@ -7,7 +7,7 @@ At the time of writing there are three main ethereum implementations available: 
 Supported platforms: **Linux, MacOS**
 
 ## 1. GETH
-#####1.1 Install
+##### 1.1 Install
 #### Linux
     sudo apt-get install software-properties-common
     sudo add-apt-repository -y ppa:ethereum/ethereum
@@ -24,18 +24,18 @@ Install Homebrew if you haven't done yet, further information to be found [here]
 
 GETH is the command line interface to run your node. Apart from interacting via command line, it also provides an interactive console and a JSON-RPC Server.  
 
-#####1.2 Start node and interact via built-in console:
+##### 1.2 Start node and interact via built-in console:
 
     geth console
 
-#####1.3 Start node and interact via JSON-RPC api from your browser:
+##### 1.3 Start node and interact via JSON-RPC api from your browser:
 
     geth --rpc --rpccorsdomain "<<your webserver address>>"
 
 
 ## 2. How to set up an Ethereum Node on a private Blockchain
 
-#####2.1 Full start command for node
+##### 2.1 Full start command for node
 
 #### Linux
 	```	
@@ -51,7 +51,7 @@ GETH is the command line interface to run your node. Apart from interacting via 
      geth --datadir "/home/USER/privateEthereum" init CustomGenesis.json
      geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081" --datadir "/Users/USER/privateEthereum" console
 
-#####2.2 Detailed information about the command above
+##### 2.2 Detailed information about the command above
 * **--rpc** : Enables remote procedure calls (so that our website can interact with the node). The default APIs enabled are: "eth,net,web3".
 
 * **--rpcapi**: Specify APIs to be enabled via HTTP-RPC, i.e. "eth,net,web3,admin,miner". **Note:** It's considered highly insecure to enable "personal" over RPC, since any user connecting to your node could brute-force the accounts in order to steal ether.
@@ -90,7 +90,7 @@ However, ipc connections are currently not supported by the web3.js library (the
 
 ## 3. How to connect your web application to the local Node (using NodeJS + express)
 
-#####3.1 set up a simple NodeJS server
+##### 3.1 set up a simple NodeJS server
 
 Create a directory somewhere and then run the following commands.
 
@@ -116,10 +116,10 @@ Create a directory somewhere and then run the following commands.
 
     })
 
-#####3.2 Get web3.js library (easy way to access geth's RPC interface from a js app)
+##### 3.2 Get web3.js library (easy way to access geth's RPC interface from a js app)
 Download [here](https://github.com/ethereum/web3.js/) or use `npm install web3`. Copy web3 folder to directory 'public'.
 
-#####3.3 Create html file in directory 'public'
+##### 3.3 Create html file in directory 'public'
 
 ```html
 <!DOCTYPE html>
@@ -138,7 +138,7 @@ web3.setProvider(new web3.providers.HttpProvider("http://localhost:8454"));
 ```
 ## 4. How to deploy contracts
 
-#####4.1 Install Solidiy Compiler solc
+##### 4.1 Install Solidiy Compiler solc
 
     npm install solc
 
@@ -150,7 +150,7 @@ If it does not return ["Solidity"], then set the path manually interactive conso
 
     `admin.setSolc("<<path to the solc executable>>");`
 
-#####4.2 Compile test contract in interactive console
+##### 4.2 Compile test contract in interactive console
  ```
     source = "contract test {\n" +
     "   /// @notice will multiply `a` by 7.\n" +
@@ -180,14 +180,14 @@ Go to the [Online Solidity Compiler](http://ethereum.github.io/browser-solidity/
 
 The [Online Compiler](http://ethereum.github.io/browser-solidity/#version=soljson-latest.js) provides the possiblity to create and test contracts directly on your private blockchain.
 
-#####5.1 Set up Node
+##### 5.1 Set up Node
 We need to add the online compiler to our list of servers, that are allowed to interact with our node  despite the same origin policy.
 
     geth --port 30303 --rpc --rpcport 8454 --rpccorsdomain "http://0.0.0.0:8081,http://ethereum.github.io" --datadir "/home/USER/privateEthereum" console
 
 (Make sure to access the online compiler via **http** protocol and not via https protocol.)
 
-#####5.2 Set Endpoint
+##### 5.2 Set Endpoint
 In the menu you can choose the "Web3 Provider" as execution environment. As endpoint type in the rpc-address and rpc-port from our node
 
     http://localhost:8454
@@ -195,12 +195,12 @@ In the menu you can choose the "Web3 Provider" as execution environment. As endp
 
 ## 6. How to interact with contracts from a different node
 
-#####6.1 Get all the defining information about the contract: (if the contract was created by yourself, retrieve the info as shown below)
+##### 6.1 Get all the defining information about the contract: (if the contract was created by yourself, retrieve the info as shown below)
 
     multiply.address;
     mutliply.abi;	// interface description
 
-#####6.2 Start different Node and find contract "multiply":
+##### 6.2 Start different Node and find contract "multiply":
 
     multiply7 = eth.contract(<<abi>>).at(<<address>>);
     fortytwo = multiply7.multiply.sendTransaction(6, { from: <<your account address>> });
@@ -211,17 +211,17 @@ In the menu you can choose the "Web3 Provider" as execution environment. As endp
 Simply use the **same gensis block** and the **same network id**.
 *(Since for test purposes you might want to run two nodes on the very same machine, simply change the port and the datadir)*
 
-#####7.1 First Node:
+##### 7.1 First Node:
 
     geth --port 30307 --datadir "/home/USER/privateEthereum1" --networkid 27 console
 
-#####7.2 Second Node:
+##### 7.2 Second Node:
 
     geth --port 30304 --datadir "/home/USER/privateEthereum2" --networkid 27 console
 
 Make sure to initialize again the very same custom genesis block as described in chapter 2, otherwise you will be on the main chain. 
 
-#####7.3 In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node.
+##### 7.3 In order to get our network initally going we need to define bootstrap nodes. This can be any existing node in our network. In our case the first node would serve as bootstrap for the second node.
 
 Retrieve the enode address with the following command:
 
